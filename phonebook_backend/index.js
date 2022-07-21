@@ -20,8 +20,6 @@ morgan.token('param', function (req, res, param) {
 });
 
 
-
-
 const Info = (count) => {
     return (
         `<div>
@@ -87,17 +85,11 @@ const generateId = () => {
     return randomId
 }
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
     if (!body.name || !body.number) {
         return response.status(400).json({
             error: 'name or number missing'
-        })
-    }
-
-    if (persons.find(person => person.name === body.name)) {
-        return response.status(400).json({
-            error: 'name must be unique'
         })
     }
 
@@ -110,6 +102,7 @@ app.post('/api/persons', (request, response) => {
     person.save().then(savedPerson => {
         response.json(savedPerson)
     })
+        .catch((error) => next(error))
 })
 
 const unknownEndpoint = (request, response) => {
