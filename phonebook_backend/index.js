@@ -66,9 +66,13 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
-    Person.findById(request.params.id, person)
+    Person.findById(request.params.id)
         .then(person => {
-            respone.json(person)
+            if (person) {
+                respone.json(person)
+            } else {
+                response.status(404).end()
+            }
         })
         .catch(error => next(error))
 })
