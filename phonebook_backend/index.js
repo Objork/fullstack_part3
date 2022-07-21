@@ -20,33 +20,12 @@ morgan.token('param', function (req, res, param) {
 });
 
 
-let persons = [
-    {
-        "id": 1,
-        "name": "Arto Hellas",
-        "number": "040-123456"
-    },
-    {
-        "id": 2,
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523"
-    },
-    {
-        "id": 3,
-        "name": "Dan Abramov",
-        "number": "12-43-234345"
-    },
-    {
-        "id": 4,
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122"
-    }
-]
 
-const Info = () => {
+
+const Info = (count) => {
     return (
         `<div>
-        <h2>Phonebook has info for ${persons.length} people</h2>
+        <h2>Phonebook has info for ${count} people</h2>
         <h2>${new Date}</h2>
         </div>`
     )
@@ -56,7 +35,9 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/info', (request, response) => {
-    response.send(Info())
+    Person.count().then((count) => {
+        response.send(Info(count))
+    })
 })
 
 app.get('/api/persons', (request, response) => {
@@ -69,12 +50,14 @@ app.get('/api/persons/:id', (request, response, next) => {
     Person.findById(request.params.id)
         .then(person => {
             if (person) {
-                respone.json(person)
+                response.json(person)
             } else {
                 response.status(404).end()
             }
         })
-        .catch(error => next(error))
+        .catch(error => {
+            next(error)
+        })
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
