@@ -69,11 +69,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
 
 app.put('/api/persons/:id', (request, respone, next) => {
     const { name, number } = request.body
-    const person = {
-        name: name,
-        number: number,
-    }
-    Person.findByIdAndUpdate(request.params.id, person, { new: true, runValidators: true, context: 'query' })
+    Person.findByIdAndUpdate(request.params.id, { name, number }, { new: true, runValidators: true, context: 'query' })
         .then(updatedPerson => {
             respone.json(updatedPerson)
         })
