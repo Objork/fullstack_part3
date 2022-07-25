@@ -68,12 +68,12 @@ app.delete('/api/persons/:id', (request, response, next) => {
 })
 
 app.put('/api/persons/:id', (request, respone, next) => {
-    const body = request.body
+    const { name, number } = request.body
     const person = {
-        name: body.name,
-        number: body.number,
+        name: name,
+        number: number,
     }
-    Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    Person.findByIdAndUpdate(request.params.id, person, { new: true, runValidators: true, context: 'query' })
         .then(updatedPerson => {
             respone.json(updatedPerson)
         })
@@ -111,9 +111,11 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint)
 
-const errorHandler = (error, request, respone, next) => {
+const errorHandler = (error, request, response, next) => {
     if (error.name === 'CastError') {
-        return respone.status(400).send({ error })
+        return response.status(400).send({ error })
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
     }
     next(error)
 }
